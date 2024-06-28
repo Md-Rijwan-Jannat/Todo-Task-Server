@@ -1,10 +1,10 @@
-require('dotenv').config();
-const express = require('express');
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+require("dotenv").config();
+const express = require("express");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 5000;
 
-const cors = require('cors');
+const cors = require("cors");
 
 app.use(cors());
 app.use(express.json());
@@ -20,8 +20,8 @@ const client = new MongoClient(uri, {
 const run = async () => {
   // await client.connect();
   try {
-    const db = client.db('todo');
-    const taskCollection = db.collection('tasks');
+    const db = client.db("todo");
+    const taskCollection = db.collection("tasks");
 
     // app.get('/tasks', async (req, res) => {
     //   const cursor = taskCollection.find({});
@@ -29,7 +29,7 @@ const run = async () => {
     //   res.send({ status: true, data: tasks });
     // });
 
-    app.get('/tasks', async (req, res) => {
+    app.get("/tasks", async (req, res) => {
       let query = {};
       if (req.query.priority) {
         query.priority = req.query.priority;
@@ -39,32 +39,32 @@ const run = async () => {
       res.send({ status: true, data: tasks });
     });
 
-    app.post('/task', async (req, res) => {
+    app.post("/task", async (req, res) => {
       const task = req.body;
       const result = await taskCollection.insertOne(task);
       res.send(result);
     });
 
-    app.get('/task/:id', async (req, res) => {
+    app.get("/task/:id", async (req, res) => {
       const id = req.params.id;
-      const result = await taskCollection.findOne({ _id: ObjectId(id) });
+      const result = await taskCollection.findOne({ id: id });
       // console.log(result);
       res.send(result);
     });
 
-    app.delete('/task/:id', async (req, res) => {
+    app.delete("/task/:id", async (req, res) => {
       const id = req.params.id;
-      const result = await taskCollection.deleteOne({ _id: ObjectId(id) });
+      const result = await taskCollection.deleteOne({ id: id });
       // console.log(result);
       res.send(result);
     });
 
     // status update
-    app.put('/task/:id', async (req, res) => {
+    app.put("/task/:id", async (req, res) => {
       const id = req.params.id;
       console.log(id);
       const task = req.body;
-      const filter = { _id: ObjectId(id) };
+      const filter = { id: id };
       const updateDoc = {
         $set: {
           isCompleted: task.isCompleted,
@@ -83,8 +83,8 @@ const run = async () => {
 
 run().catch((err) => console.log(err));
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
+app.get("/", (req, res) => {
+  res.send("Hello World!");
 });
 
 app.listen(port, () => {
