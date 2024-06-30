@@ -9,7 +9,7 @@ const cors = require("cors");
 app.use(cors());
 app.use(express.json());
 
-const uri = `mongodb://localhost:27017`;
+const uri = process.env.DATABASE_WRL;
 
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -20,7 +20,7 @@ const client = new MongoClient(uri, {
 const run = async () => {
   // await client.connect();
   try {
-    const db = client.db("todo");
+    const db = client.db("todo-task-management");
     const taskCollection = db.collection("tasks");
 
     // app.get('/tasks', async (req, res) => {
@@ -39,38 +39,46 @@ const run = async () => {
       res.send({ status: true, data: tasks });
     });
 
+    // Create a new task
     app.post("/task", async (req, res) => {
       const task = req.body;
-      const result = await taskCollection.insertOne(task);
+      const createdAt = new Date();
+      const updatedAt = new Date();
+      const newData = {
+        ...task,
+        createdAt,
+        updatedAt,
+      };
+      const result = await taskCollection.insertOne(newData);
       res.send(result);
     });
 
+    // Get a task by id
     app.get("/task/:id", async (req, res) => {
       const id = req.params.id;
-      const result = await taskCollection.findOne({ id: id });
-      // console.log(result);
+      const result = await taskCollection.findOne({ _id: new ObjectId(id) });
       res.send(result);
     });
 
+    // Delete a task by id
     app.delete("/task/:id", async (req, res) => {
       const id = req.params.id;
-      const result = await taskCollection.deleteOne({ id: id });
-      // console.log(result);
+      const result = await taskCollection.deleteOne({ _id: new ObjectId(id) });
       res.send(result);
     });
 
-    // status update
+    // Update a task by id
     app.put("/task/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id);
       const task = req.body;
-      const filter = { id: id };
+      const filter = { _id: new ObjectId(id) };
       const updateDoc = {
         $set: {
-          isCompleted: task.isCompleted,
           title: task.title,
           description: task.description,
           priority: task.priority,
+          isCompleted: task.isCompleted,
+          updatedAt: new Date(),
         },
       };
       const options = { upsert: true };
