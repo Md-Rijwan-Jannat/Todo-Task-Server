@@ -46,6 +46,4 @@ This is a simple CRUD (Create, Read, Update, Delete) application for managing To
 
 ## Deploy link
 
-### Api endpoints
-
 - **URL:** https://todo-task-server.vercel.app/
